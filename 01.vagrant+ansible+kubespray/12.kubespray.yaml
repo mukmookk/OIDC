@@ -1,0 +1,61 @@
+---
+- name: master
+  hosts: master 
+  gather_facts: no
+  become: yesi
+  vars: 
+    home: /home/vagrant/kubespray/
+
+  tasks:
+    - name: change hosts 
+      blockinfile:
+        path: /home/vagrant/kubespray/inventory/sample/inventory.ini 
+        block: | 
+          [all]
+          master ansible_host=211.183.3.137 ip=211.183.3.137 etcd_member_name=etcd1
+          node1 ansible_host=211.183.3.202 ip=211.183.3.202 etcd_member_name=etcd2
+          node2 ansible_host=211.183.3.203 ip=211.183.3.203 etcd_member_name=etcd3
+          node3 ansible_host=211.183.3.204 ip=211.183.3.204 etcd_member_name=etcd4
+
+          [kube_master] 
+          master 
+
+          [etcd] 
+          master
+
+          [kube_node]
+          node1
+          node2
+          node3
+
+          [k8s_cluster:children]
+          kube_master
+          kube_node
+
+
+    - name: addon helm change
+      replace:
+        path: /home/vagrant/kubespray/inventory/sample/group_vars/k8s_cluster/addons.yml
+        regexp: "helm_enabled: false"
+        replace: "helm_enabled: true"
+
+    - name: addon metrics change
+      replace:
+        path: /home/vagrant/kubespray/inventory/sample/group_vars/k8s_cluster/addons.yml
+        regexp: "metrics_server_enabled: false"
+        replace: "metrics_server_enabled: true"
+
+    - name: addon ingress change
+      replace:
+        path: /home/vagrant/kubespray/inventory/sample/group_vars/k8s_cluster/addons.yml
+        regexp: "ingress_nginx_enabled: false"
+        replace: "ingress_nginx_enabled: true"
+
+    - name: addon iptables change
+      replace:
+        path: /home/vagrant/kubespray/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml
+        regexp: "kube_proxy_mode: ipvs"
+        replace: "kube_proxy_mode: iptables"
+
+    - name: run kubespray 
+      command: ansible-playbook -i /home/vagrant/kubespray/inventory/sample/inventory.ini --become cluster.yml
