@@ -1,0 +1,28 @@
+---
+- name: master
+  hosts: master
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: install wget python3-pip git
+      yum:
+        name:
+          - wget
+          - python3-pip
+          - git
+        state: present
+
+    - name: pip update
+      command: pip3 install setuptools-rust --upgrade pip
+
+
+    - name: install netaddr jinja2
+      command: pip3 install jinja2 netaddr ansible
+
+    - name: ip_forward
+      shell: echo "1" > /proc/sys/net/ipv4/ip_forward
+
+    - name: kubespray install
+      git:
+        repo: https://github.com/kubernetes-sigs/kubespray
