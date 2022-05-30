@@ -3,10 +3,10 @@
 # Update hosts file
 echo "[TASK 1] Update /etc/hosts file"
 cat >>/etc/hosts<<EOF
-211.183.3.137 node1
-211.183.3.202 node2
-211.183.3.203 node3
-211.183.3.204 node4
+211.183.3.200 centos-m
+211.183.3.201 centos-n1
+211.183.3.202 centos-n2
+211.183.3.203 centos-n3
 EOF
 
 # Enable ssh password authentication
@@ -22,3 +22,6 @@ systemctl reload sshd
 # Set Root password
 echo "[TASK 4] Set root password"
 echo root:kubeadmin | chpasswd
+
+# Install Must Item
+yum install -y vim net-tools curl wget git tree httpd
