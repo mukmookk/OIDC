@@ -1,13 +1,12 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-N = 3
+N = 2
 
 Vagrant.configure("2") do |config|
     config.vm.define "centos-m" do |cfg|
       cfg.vm.box = "generic/centos7"
       cfg.vm.host_name = "centos-m"
-      cfg.disksize.size = "10GB"
       # network
       cfg.vm.network :public_network, :bridge => "br0", :dev => "br0", ip:"211.183.3.200"
       cfg.vm.network "private_network", ip: "5.5.5.10"
@@ -17,7 +16,7 @@ Vagrant.configure("2") do |config|
       cfg.vm.provision "shell", inline: "/bin/bash 00.bootstrap.sh", privileged: true
       # master init
       cfg.vm.provision "file", source: "01.bootmaster.sh", destination: "01.bootmaster.sh"
-      cfg.vm.provision "shell", inline: "/bin/bash 01.bootmaster.sh", privileged: true
+      cfg.vm.provision "shell", inline: "/bin/bash 01.bootmaster.sh"
       # key provision
       cfg.vm.provision "file", source: ".ansible.key", destination: ".ansible.key"
       cfg.vm.provision "shell", inline: "echo -e '\n' >> /home/vagrant/.ssh/authorized_keys"
@@ -31,7 +30,6 @@ Vagrant.configure("2") do |config|
     config.vm.define "centos-n#{i}" do |cfg|
       cfg.vm.box = "generic/centos7"
       cfg.vm.host_name = "centos-n#{i}"
-      cfg.disksize.size = "10GB"
       cfg.vm.network :public_network, :bridge => "br0", :dev => "br0", ip:"211.183.3.20#{i}"
       cfg.vm.network "private_network", ip: "5.5.5.1#{i}"
       cfg.vm.network "forwarded_port", guest: 22, host: "6001#{i}", id: "ssh"
