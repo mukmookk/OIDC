@@ -25,3 +25,6 @@ echo root:kubeadmin | chpasswd
 
 # Install Must Item
 yum install -y vim net-tools curl wget git tree httpd
+
+# swap off
+swapoff -a
