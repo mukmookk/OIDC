@@ -2,22 +2,28 @@
 - name: master
   hosts: master 
   gather_facts: no
-  become: yesi
+  become: yes
   vars: 
     home: /home/vagrant/kubespray/
 
   tasks:
+    - name: kubespray install
+      git:
+        repo: https://github.com/kubernetes-sigs/kubespray
+        dest: /home/vagrant/kubespray
+    - name: install requirements
+      command: pip3 install -r /home/vagrant/kubespray/requirements-2.11.txt
     - name: change hosts 
       blockinfile:
         path: /home/vagrant/kubespray/inventory/sample/inventory.ini 
         block: | 
           [all]
-          master ansible_host=211.183.3.137 ip=211.183.3.137 etcd_member_name=etcd1
-          node1 ansible_host=211.183.3.202 ip=211.183.3.202 etcd_member_name=etcd2
-          node2 ansible_host=211.183.3.203 ip=211.183.3.203 etcd_member_name=etcd3
-          node3 ansible_host=211.183.3.204 ip=211.183.3.204 etcd_member_name=etcd4
+          master ansible_host=211.183.3.200 ip=211.183.3.200 etcd_member_name=etcd1 
+          node1 ansible_host=211.183.3.201 ip=211.183.3.201 etcd_member_name=etcd2
+          node2 ansible_host=211.183.3.202 ip=211.183.3.202 etcd_member_name=etcd3
+          node3 ansible_host=211.183.3.203 ip=211.183.3.203 etcd_member_name=etcd4
 
-          [kube_master] 
+          [kube_control_plane] 
           master 
 
           [etcd] 
@@ -28,9 +34,12 @@
           node2
           node3
 
+          [calico_rr]
+
           [k8s_cluster:children]
-          kube_master
+          kube_control_plane
           kube_node
+          calico_rr
 
 
     - name: addon helm change
@@ -57,5 +66,5 @@
         regexp: "kube_proxy_mode: ipvs"
         replace: "kube_proxy_mode: iptables"
 
-    - name: run kubespray 
-      command: ansible-playbook -i /home/vagrant/kubespray/inventory/sample/inventory.ini --become cluster.yml
+    # - name: run kubespray 
+    #   command: ansible-playbook -i /home/vagrant/kubespray/inventory/sample/inventory.ini --become /home/vagrant/kubespray/cluster.yml

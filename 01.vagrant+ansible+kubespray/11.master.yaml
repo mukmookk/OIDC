@@ -22,7 +22,3 @@
 
     - name: ip_forward
       shell: echo "1" > /proc/sys/net/ipv4/ip_forward
-
-    - name: kubespray install
-      git:
-        repo: https://github.com/kubernetes-sigs/kubespray
