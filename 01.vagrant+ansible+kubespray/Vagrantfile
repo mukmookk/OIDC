@@ -7,13 +7,21 @@ Vagrant.configure("2") do |config|
     config.vm.define "centos-m" do |cfg|
       cfg.vm.box = "generic/centos7"
       cfg.vm.host_name = "centos-m"
+      cfg.disksize.size = "10GB"
+      # network
       cfg.vm.network :public_network, :bridge => "br0", :dev => "br0", ip:"211.183.3.200"
       cfg.vm.network "private_network", ip: "5.5.5.10"
       cfg.vm.network "forwarded_port", guest: 22, host: 60010, id: "ssh"
+      # all init
       cfg.vm.provision "file", source: "00.bootstrap.sh", destination: "00.bootstrap.sh"
-      cfg.vm.provision "file", source: "01.bootmaster.sh", destination: "01.bootmaster.sh"
       cfg.vm.provision "shell", inline: "/bin/bash 00.bootstrap.sh", privileged: true
+      # master init
+      cfg.vm.provision "file", source: "01.bootmaster.sh", destination: "01.bootmaster.sh"
       cfg.vm.provision "shell", inline: "/bin/bash 01.bootmaster.sh", privileged: true
+      # key provision
+      cfg.vm.provision "file", source: ".ansible.key", destination: ".ansible.key"
+      cfg.vm.provision "shell", inline: "echo -e '\n' >> /home/vagrant/.ssh/authorized_keys"
+      cfg.vm.provision "shell", inline: "cat .ansible.key >> /home/vagrant/.ssh/authorized_keys"
       cfg.vm.provider :libvirt do |rsc|
         rsc.memory = 2048
         rsc.cpus = 2
@@ -23,15 +31,17 @@ Vagrant.configure("2") do |config|
     config.vm.define "centos-n#{i}" do |cfg|
       cfg.vm.box = "generic/centos7"
       cfg.vm.host_name = "centos-n#{i}"
+      cfg.disksize.size = "10GB"
       cfg.vm.network :public_network, :bridge => "br0", :dev => "br0", ip:"211.183.3.20#{i}"
       cfg.vm.network "private_network", ip: "5.5.5.1#{i}"
       cfg.vm.network "forwarded_port", guest: 22, host: "6001#{i}", id: "ssh"
       cfg.vm.provision "file", source: "00.bootstrap.sh", destination: "00.bootstrap.sh"
-      cfg.vm.provision "file", source: ".env.key", destination: ".env.key"
+      cfg.vm.provision "file", source: ".master.key", destination: ".master.key"
       cfg.vm.provision "shell", inline: "/bin/bash 00.bootstrap.sh", privileged: true
-      cfg.vm.provision "shell", inline: "cat .env.key >> /home/vagrant/.ssh/authorized_keys"
+      cfg.vm.provision "shell", inline: "cat .master.key >> /home/vagrant/.ssh/authorized_keys"
+      # 메모리 최소 2GB 이상해야한다.
       cfg.vm.provider :libvirt do |rsc|
-        rsc.memory = 1024
+        rsc.memory = 2048
         rsc.cpus = 1
       end
     end
