@@ -1,0 +1,17 @@
+---
+- hosts: demo
+  become: true
+  become_method: sudo
+  tasks:
+  - name: ping
+    ping:
+
+  - name: install packages
+    apt: 
+      name: "{{ packages }}" 
+      state: latest
+      update_cache: yes 
+    vars:
+      packages:
+      - git
+      - nginx
