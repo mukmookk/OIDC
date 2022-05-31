@@ -1,6 +1,5 @@
 require 'yaml'
 
-# reference: https://www.debugcn.com/en/article/57056373.html
 CONFIG = YAML.load_file(File.join(File.dirname(__FILE__), 'config.yml'))
 
 Vagrant.configure("2") do |config|

@@ -1,7 +1,7 @@
 controlplanes:
-  - name: kubespray-controlpalne-1
+  - name: kubespray-controlplane-1
     box: generic/ubuntu1804
-    hostname: kubespray-controlpalne-1
+    hostname: kubespray-controlplane-1
     ip: 211.183.3.200
     memory: 4096
     cpu: 4
