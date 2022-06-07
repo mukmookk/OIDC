@@ -1,3 +1,7 @@
 .vagrant/
 .vagrant
 .vagrant/*
+
+.terraform/
+.terraform.lock.hcl
+terraform*
